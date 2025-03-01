@@ -1,16 +1,18 @@
-import React from "react";
 import Link from "next/link";
-import { PrismaClient, Book } from "@prisma/client";
 import prisma from "../../../lib/prisma";
 
-export default async function BookListingPage() {
-  let books: Book[] = [];
-
+// Fetch books from the database (server-side function)
+async function getBooks() {
   try {
-    books = await prisma.book.findMany(); // Fetch all books from the database
+    return await prisma.book.findMany();
   } catch (error) {
     console.error("Error fetching books:", error);
+    return []; // Return an empty array if there's an error
   }
+}
+
+export default async function BookListingPage() {
+  const books = await getBooks();
 
   return (
     <div>
@@ -23,7 +25,7 @@ export default async function BookListingPage() {
               <th>Author</th>
               <th>Published</th>
               <th>ISBN</th>
-              <th>Actions</th> {/* Add actions column for edit link */}
+              <th>Actions</th>
             </tr>
           </thead>
           {books.length === 0 ? (
@@ -38,7 +40,7 @@ export default async function BookListingPage() {
                 <tr key={book.id}>
                   <td>{book.title}</td>
                   <td>{book.author}</td>
-                  <td>{new Date(book.published).toLocaleDateString()}</td>
+                  <td>{book.published ? new Date(book.published).toLocaleDateString() : "N/A"}</td>
                   <td>{book.isbn}</td>
                   <td>
                     <Link href={`/books/edit/${book.id}`} style={{ color: "blue", textDecoration: "underline" }}>
