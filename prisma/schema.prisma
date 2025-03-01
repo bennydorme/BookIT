@@ -24,4 +24,3 @@ model Book {
 
   @@index([isbn])
 }
-\
