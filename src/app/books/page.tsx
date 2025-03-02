@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getBooks } from "../../../lib/actions/api/books/bookActions"; // Import getBooks
-import { handleDelete } from "./handleDelete";
+import DeleteBookButton from "./deleteBookButton"; // Import the new client component
 
 export default async function BookListingPage() {
   const books = await getBooks(); // Fetch books
@@ -31,19 +31,20 @@ export default async function BookListingPage() {
                 <tr key={book.id}>
                   <td style={{ textAlign: "center", marginTop: "40px" }}>{book.title}</td>
                   <td style={{ textAlign: "center", marginTop: "40px" }}>{book.author}</td>
-                  <td style={{ textAlign: "center", marginTop: "40px" }}>{book.published ? new Date(book.published).toLocaleDateString() : "N/A"}</td>
+                  <td style={{ textAlign: "center", marginTop: "40px" }}>
+                    {book.published ? new Date(book.published).toLocaleDateString() : "N/A"}
+                  </td>
                   <td style={{ textAlign: "center", marginTop: "40px" }}>{book.isbn}</td>
                   <td style={{ textAlign: "center", marginTop: "40px" }}>
-                    <Link href={`/books/edit/${book.id}`} style={{ color: "blue", textDecoration: "underline" }}>
+                    <Link href={`/books/details/${book.id}`} style={{ color: "green", textDecoration: "underline", marginRight: "10px" }}>
+                      View Details
+                    </Link>
+                    {" | "}
+                    <Link href={`/books/edit/${book.id}`} style={{ color: "blue", textDecoration: "underline", marginRight: "10px" }}>
                       Edit
                     </Link>
                     {" | "}
-                    <form action={handleDelete} method="POST" style={{ display: "inline" }}>
-                      <input type="hidden" name="id" value={book.id} />
-                      <button type="submit" style={{ color: "red", border: "none", background: "none", cursor: "pointer" }}>
-                        Delete
-                      </button>
-                    </form>
+                    <DeleteBookButton bookId={book.id} /> {/* Use the client component here */}
                   </td>
                 </tr>
               ))}
