@@ -1,18 +1,9 @@
 import Link from "next/link";
-import prisma from "../../../lib/prisma";
-
-// Fetch books from the database (server-side function)
-async function getBooks() {
-  try {
-    return await prisma.book.findMany();
-  } catch (error) {
-    console.error("Error fetching books:", error);
-    return []; // Return an empty array if there's an error
-  }
-}
+import { getBooks } from "../../../lib/actions/api/books/bookActions"; // Import getBooks
+import { handleDelete } from "./handleDelete";
 
 export default async function BookListingPage() {
-  const books = await getBooks();
+  const books = await getBooks(); // Fetch books
 
   return (
     <div>
@@ -38,14 +29,21 @@ export default async function BookListingPage() {
             <tbody>
               {books.map((book) => (
                 <tr key={book.id}>
-                  <td>{book.title}</td>
-                  <td>{book.author}</td>
-                  <td>{book.published ? new Date(book.published).toLocaleDateString() : "N/A"}</td>
-                  <td>{book.isbn}</td>
-                  <td>
+                  <td style={{ textAlign: "center", marginTop: "40px" }}>{book.title}</td>
+                  <td style={{ textAlign: "center", marginTop: "40px" }}>{book.author}</td>
+                  <td style={{ textAlign: "center", marginTop: "40px" }}>{book.published ? new Date(book.published).toLocaleDateString() : "N/A"}</td>
+                  <td style={{ textAlign: "center", marginTop: "40px" }}>{book.isbn}</td>
+                  <td style={{ textAlign: "center", marginTop: "40px" }}>
                     <Link href={`/books/edit/${book.id}`} style={{ color: "blue", textDecoration: "underline" }}>
                       Edit
                     </Link>
+                    {" | "}
+                    <form action={handleDelete} method="POST" style={{ display: "inline" }}>
+                      <input type="hidden" name="id" value={book.id} />
+                      <button type="submit" style={{ color: "red", border: "none", background: "none", cursor: "pointer" }}>
+                        Delete
+                      </button>
+                    </form>
                   </td>
                 </tr>
               ))}

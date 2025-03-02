@@ -72,7 +72,7 @@ export default function EditBookPage() {
       {book && (
         <form onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="title">Title</label>
+            <label  htmlFor="title">Title</label>
             <input
               type="text"
               id="title"

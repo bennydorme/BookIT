@@ -2,14 +2,14 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createBook } from "../../../../lib/actions/api/books/bookActions";  // Server-side action for book creation
+import { createBook } from "../../../../lib/actions/api/books/bookActions"; // Server-side action for book creation
 
 export default function CreateBookPage() {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [published, setPublished] = useState("");
   const [isbn, setIsbn] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | string[]>(""); // Can store either string or array of errors
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
 
@@ -22,15 +22,21 @@ export default function CreateBookPage() {
     formData.append("published", published);
     formData.append("isbn", isbn);
 
-    const { success, book, error } = await createBook(formData);  // Server action
+    const { success, book, error, errors } = await createBook(formData); // Server action
 
     if (success) {
       setSuccessMessage("Book created successfully!");
       setTimeout(() => {
-        router.push("/books");  // Redirect to books listing after success
+        router.push("/books"); // Redirect to books listing after success
       }, 100);
     } else {
-      setError(error || "An unknown error occurred");
+      if (errors) {
+        // If there are validation errors, display them as an array
+        setError(errors.map((err: { message: string }) => err.message));
+      } else {
+        // If there's a single error message
+        setError(error || "An unknown error occurred");
+      }
     }
   };
 
@@ -38,8 +44,7 @@ export default function CreateBookPage() {
     <div>
       <h2>Create a New Book</h2>
       <form onSubmit={handleSubmit}>
-        {[
-          { label: "Title", value: title, setter: setTitle },
+        {[{ label: "Title", value: title, setter: setTitle },
           { label: "Author", value: author, setter: setAuthor },
           { label: "Published Date", value: published, setter: setPublished, type: "date" },
           { label: "ISBN", value: isbn, setter: setIsbn },
@@ -56,7 +61,15 @@ export default function CreateBookPage() {
             />
           </div>
         ))}
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {Array.isArray(error) ? (
+          <div style={{ color: "red" }}>
+            {error.map((err, index) => (
+              <p key={index}>{err}</p>
+            ))}
+          </div>
+        ) : (
+          error && <p style={{ color: "red" }}>{error}</p>
+        )}
         {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
         <button type="submit">Create Book</button>
       </form>
