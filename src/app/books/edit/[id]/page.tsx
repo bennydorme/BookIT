@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateBook, getBookById } from "../../../../../lib/actions/api/books/bookActions";
-
+import Link from "next/link";
 export default function EditBookPage({ params }: { params: { id: string } }) {
   const [id, setId] = useState<string | null>(null); // Initializing state to handle dynamic ID
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function EditBookPage({ params }: { params: { id: string } }) {
   const [published, setPublished] = useState("");
   const [isbn, setIsbn] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Await the `params` object to ensure we have the ID before using it
   useEffect(() => {
@@ -49,8 +50,10 @@ export default function EditBookPage({ params }: { params: { id: string } }) {
 
     try {
       if (id) {
-        await updateBook(id, { title, author, published, isbn });
-        router.push("/books"); // Redirect to books list
+        alert("Book details updated successfully!");
+        setTimeout(() => {
+          router.push(`/books/details/${id}`); // Redirect to book details after success
+        }, 200);
       }
     } catch (err) {
       setError("Error updating book.");
@@ -81,6 +84,9 @@ export default function EditBookPage({ params }: { params: { id: string } }) {
         </div>
         <button type="submit">Save Changes</button>
       </form>
+      <div><Link href={`/books`} style={{ color: "blue", textDecoration: "underline", marginRight: "10px" }}>
+        Go back to book list
+      </Link></div>
     </div>
   );
 }

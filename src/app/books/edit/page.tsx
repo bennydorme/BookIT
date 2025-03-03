@@ -10,6 +10,7 @@ export default function EditBookPage() {
   const [author, setAuthor] = useState("");
   const [published, setPublished] = useState("");
   const [isbn, setIsbn] = useState("");
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const router = useRouter();
   const { id } = router.query;
 
@@ -57,8 +58,12 @@ export default function EditBookPage() {
           isbn,
         },
       });
-
-      router.push("/books");
+      alert("Book details updated successfully!");
+      setTimeout(() => {
+        if (book) {
+          router.push(`/books/details/${book.id}`); // Redirect to books listing after success
+        }
+      }, 200);
     } catch (err) {
       setError("Error updating book.");
     }

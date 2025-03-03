@@ -1,41 +1,41 @@
-"use client"; // Make this a client-side component
+"use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { handleDelete } from "./handleDelete"; 
 
 export default function DeleteBookButton({ bookId }: { bookId: string }) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
-  const handleDeleteConfirmation = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleDeleteConfirmation = async () => {
     const confirmed = window.confirm("Are you sure you want to delete this book?");
-    if (confirmed) {
-      setIsDeleting(true); // Set deleting state to show loading (optional)
-      
-      // Form submission logic
-      const formData = new FormData();
-      formData.append("id", bookId);
+    if (!confirmed) return;
 
-      const response = await fetch("/books", {
-        method: "POST",
-        body: formData,
-      });
+    setIsDeleting(true);
 
-      if (response.ok) {
-        window.location.reload(); // Refresh the page after deletion
-      } else {
-        alert("Failed to delete the book.");
-        setIsDeleting(false); // Reset deleting state on error
-      }
+    const response = await handleDelete(bookId);
+
+    if (response.success) {
+        alert('Book sucessfully deleted!');
+        setTimeout(() => {
+            router.push("/books"); 
+          }, 100);
+    } else {
+        alert('Could not delete book, please contact support');
+      alert(`Error: ${response.error}`);
     }
+
+    setIsDeleting(false);
   };
 
   return (
-    <form onSubmit={handleDeleteConfirmation} style={{ display: "inline" }}>
-      <input type="hidden" name="id" value={bookId} />
-      <button type="submit" style={{ color: "red", border: "none", background: "none", cursor: "pointer" }} disabled={isDeleting}>
-        {isDeleting ? "Deleting..." : "Delete"}
-      </button>
-    </form>
+    <button
+      onClick={handleDeleteConfirmation}
+      style={{ color: "red", border: "none", background: "none", cursor: "pointer" }}
+      disabled={isDeleting}
+    >
+      {isDeleting ? "Deleting..." : "Delete"}
+    </button>
   );
 }

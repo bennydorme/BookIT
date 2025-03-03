@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // Use `useParams` from next/navigation
 import { getBookById } from "../../../../../lib/actions/api/books/bookActions"; // Import getBookById
 import DeleteBookButton from "../../deleteBookButton"; // Import the new client component
-
+import Link from "next/link";
 export default function BookDetailPage() {
   const [book, setBook] = useState<{ title: string; author: string; published?: string; isbn: string; id: string } | null>(null); // State to store the fetched book
   const [error, setError] = useState<string | null>(null); // State for error handling
@@ -30,7 +30,7 @@ export default function BookDetailPage() {
 
       fetchBook(); // Call the fetch function when the component mounts or ID changes
     }
-  }, [id]); // Re-run the effect if the ID changes
+  }, [id]); 
 
   if (error) return <div>{error}</div>; // Handle error if the book is not found
   if (!book) return <div>Loading...</div>; // Show loading while fetching book details
@@ -47,6 +47,9 @@ export default function BookDetailPage() {
       <div style={{ marginTop: "20px" }}>
         <DeleteBookButton bookId={book.id} /> {/* Use the client component here */}
       </div>
+      <Link href={`/books`} style={{ color: "blue", textDecoration: "underline", marginRight: "10px" }}>
+                     Go back to book list
+                    </Link>
     </div>
   );
 }

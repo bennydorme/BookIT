@@ -1,5 +1,5 @@
 "use client"; // Ensure it's a client component
-
+import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBook } from "../../../../lib/actions/api/books/bookActions"; // Server-side action for book creation
@@ -25,10 +25,12 @@ export default function CreateBookPage() {
     const { success, book, error, errors } = await createBook(formData); // Server action
 
     if (success) {
-      setSuccessMessage("Book created successfully!");
+      alert("Book created successfully!");
       setTimeout(() => {
-        router.push("/books"); // Redirect to books listing after success
-      }, 100);
+        if (book) {
+          router.push(`/books/details/${book.id}`); // Redirect to books listing after success
+        }
+      }, 200);
     } else {
       if (errors) {
         // If there are validation errors, display them as an array
@@ -54,7 +56,7 @@ export default function CreateBookPage() {
             <input
               type={type}
               id={label}
-              name={label.toLowerCase().replace(/\s+/g, '_')} // Dynamically creating id based on label
+              name={label.toLowerCase().replace(/\s+/g, '_')} 
               value={value}
               onChange={(e) => setter(e.target.value)}
               required
@@ -73,6 +75,9 @@ export default function CreateBookPage() {
         {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
         <button type="submit">Create Book</button>
       </form>
+      <Link href={`/books`} style={{ color: "blue", textDecoration: "underline", marginRight: "10px" }}>
+                     Go back to book list
+                    </Link>
     </div>
   );
 }
